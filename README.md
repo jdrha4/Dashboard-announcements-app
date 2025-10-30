@@ -1,3 +1,5 @@
+C#
+
 A dashboard announcement application made in c# as a school project and partially for Continental.
 
 The individual announcements can have comments, reactions, open in modal,...
