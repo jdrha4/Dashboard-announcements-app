@@ -1,0 +1,37 @@
+@model RegisterViewModel
+
+<!-- Full name input -->
+<div class="form-group mb-3 text-start">
+    <label asp-for="Name" class="form-label fw-bold text-orange">full name</label>
+    <input asp-for="Name" class="form-control rounded-3 shadow-none" placeholder="enter your name" required autocomplete="name">
+    <span asp-validation-for="Name" class="text-danger fs-6"></span>
+</div>
+
+<!-- Email input -->
+<div class="form-group mb-3 text-start">
+    <label asp-for="Email" class="form-label fw-bold text-orange">e-mail</label>
+    <input asp-for="Email" class="form-control rounded-3 shadow-none" placeholder="e-mail@example.com" required autocomplete="email">
+    <span asp-validation-for="Email" class="text-danger fs-6"></span>
+</div>
+
+<!-- Password input -->
+<div class="form-group mb-3 text-start">
+    <label asp-for="Password" class="form-label fw-bold text-orange">password</label>
+    <div class="password-wrapper position-relative">
+        <input asp-for="Password" class="form-control rounded-3 shadow-none pe-5" id="Password" type="password" placeholder="*************" required autocomplete="new-password">
+        <i class="bi bi-eye toggle-password position-absolute top-50 end-0 translate-middle-y me-3"></i>
+    </div>
+    <span asp-validation-for="Password" class="text-danger fs-6"></span>
+</div>
+
+<!-- Confirm password input -->
+<div class="form-group mb-3 text-start">
+    <label asp-for="PasswordRepeat" class="form-label fw-bold text-orange">confirm password</label>
+    <div class="password-wrapper position-relative">
+        <input asp-for="PasswordRepeat" class="form-control rounded-3 shadow-none pe-5" id="PasswordRepeat" type="password" placeholder="*************" required autocomplete="new-password">
+        <i id="passwordMatchIcon" class="bi bi-check-circle-fill text-success position-absolute end-0 top-50 translate-middle-y me-5"></i>
+        <i id="passwordMismatchIcon" class="bi bi-x-circle-fill text-danger position-absolute end-0 top-50 translate-middle-y me-5"></i>
+        <i class="bi bi-eye toggle-password position-absolute top-50 end-0 translate-middle-y me-3"></i>
+    </div>
+    <span asp-validation-for="PasswordRepeat" class="text-danger fs-6"></span>
+</div>

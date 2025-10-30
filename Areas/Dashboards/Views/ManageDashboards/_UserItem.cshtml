@@ -1,0 +1,22 @@
+@model Application.Areas.Dashboards.Models.AssignUsersViewModel.UserSelection
+
+@{
+    string icon = ViewData["icon"]?.ToString() ?? "bi-person";
+    string textClass = ViewData["textClass"]?.ToString() ?? "text-muted";
+    int maxNameLength = ViewData["maxNameLength"] as int? ?? 20;
+    int maxEmailLength = ViewData["maxEmailLength"] as int? ?? 25;
+}
+
+<div class="d-flex align-items-center gap-3">
+    <i class="bi @icon fs-2 flex-shrink-0"></i>
+    <div class="flex-grow-1 overflow-hidden">
+        <div class="d-flex flex-column">
+            <strong class="text-uppercase text-truncate" title="@Model.UserName" style="max-width: 100%;">
+                @Truncate(Model.UserName, maxNameLength)
+            </strong>
+            <small class="text-truncate @textClass" title="@Model.UserEmail" style="max-width: 100%;">
+                @Truncate(Model.UserEmail, maxEmailLength)
+            </small>
+        </div>
+    </div>
+</div>

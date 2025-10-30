@@ -1,0 +1,24 @@
+@model List<Application.Areas.Account.Models.UserRoleViewModel>
+@{
+    ViewData["Title"] = "Manage User Roles";
+}
+
+<div class="container my-5">
+    <h1 class="text-center mb-4">Manage User Roles</h1>
+
+    <div class="input-group mb-4">
+        <input type="text" id="query" name="query" autocomplete="off"
+               placeholder="Search users..." class="form-control rounded-3"
+               hx-get hx-action="Index"
+               hx-target="#users-list"
+               hx-trigger="keyup changed delay:250ms"
+               hx-indicator="#search-loader"
+               hx-vals='js:{query: document.getElementById("query").value}' />
+    </div>
+
+    <div id="search-loader" class="htmx-indicator text-center mb-3">Loading...</div>
+
+    <div id="users-list" hx-swap="innerHTML">
+        @await Html.PartialAsync("_UserList", Model)
+    </div>
+</div>

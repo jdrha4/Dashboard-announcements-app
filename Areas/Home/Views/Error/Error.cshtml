@@ -1,0 +1,55 @@
+@{
+    ViewData["Title"] = "Error";
+    var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+}
+
+<div class="container d-flex flex-column justify-content-center text-center py-5">
+
+    <!-- Error icon and headline -->
+    <div class="text-danger">
+        <i class="bi bi-exclamation-triangle-fill display-1"></i>
+        <h1 class="display-5 fw-bolder text-uppercase">Oops! Something went wrong.</h1>
+    </div>
+
+    <!-- Error message -->
+    <p class="fs-3 fw-bold text-danger">An error occurred while processing your request.</p>
+
+    <!-- Request ID -->
+    @if (ViewData["RequestId"] != null)
+    {
+        <p class="fs-5">
+            <strong>Request ID:</strong>
+            <code class="text-dark fs-5">@ViewData["RequestId"]</code>
+        </p>
+    }
+
+    <!-- Development Mode Summary -->
+    @if (!isDevelopment)
+    {
+        <div class="alert alert-warning border-dark shadow-sm" role="alert">
+            <h5 class="text-uppercase fw-bolder text-center">Development Mode</h5>
+            <p>Swapping to <strong>Development</strong> environment will display more detailed information about the error that occurred.</p>
+
+            <div class="error-details-box w-100 w-md-75 w-lg-50 mx-auto">
+                <button class="btn btn-dark fw-bold error-details-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#errorTechnicalDetails">
+                    <i class="bi bi-lightbulb-fill me-2"></i> Show Technical Details
+                </button>
+
+                <div class="collapse error-details-content" id="errorTechnicalDetails">
+                    <p class="mb-2">
+                        Swapping to <strong>Development</strong> environment will display more detailed information about the error that occurred.
+                    </p>
+                    <p class="mb-0">
+                        <strong class="text-warning">The Development environment shouldn't be enabled for deployed applications.</strong>
+                        It can result in displaying sensitive information from exceptions to end users.
+                        For local debugging, enable the <code class="text-danger">ASPNETCORE_ENVIRONMENT</code> variable to <strong>Development</strong> and restart the app.
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+    <!-- Back to Home -->
+    <a asp-route="default" class="btn btn-success mt-4 fw-bold">
+        <i class="bi bi-arrow-left-circle me-2"></i> Go back to homepage
+    </a>
+</div>

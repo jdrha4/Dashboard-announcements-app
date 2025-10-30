@@ -1,0 +1,47 @@
+@model DashboardViewModel
+
+<div class="col dashboard-card" data-name="@Model.Name.ToLower()">
+    <div class="dashboard-container card h-100 shadow-sm rounded-3 position-relative">
+        <div class="card-body d-flex flex-column">
+            <h3 class="card-title text-truncate" title="@Model.Name">@Model.Name</h3>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Description))
+            {
+                <p class="card-text text-truncate">
+                    <i class="bi bi-file-text"></i>
+                    <span title="@Model.Description">@(Model.Description)</span>
+                </p>
+            }
+
+            <p class="card-text d-flex align-items-center justify-content-between gap-2">
+                <span class="d-flex align-items-center gap-2">
+                    @if (!string.IsNullOrEmpty(Model.ProfileImageBase64))
+                    {
+                        <img src="@Model.ProfileImageBase64" class="rounded-circle shadow-sm" style="width:2rem; height:2rem; object-fit:cover;" alt="Profile picture" />
+                    }
+                    else
+                    {
+                        <img src="~/images/default-avatar.png" class="rounded-circle shadow-sm" style="width:2rem; height:2rem; object-fit:cover;" alt="Default profile picture" />
+                    }
+                    @Model.AuthorName
+                </span>
+                <span class="d-flex align-items-center gap-1">
+                    <a asp-action="AssignUsers" asp-route-dashboardId="@Model.Id"
+                        class="text-decoration-none text-dark mx-1" title="Assign Users">
+                        <i class="bi bi-person-fill-add me-1"></i> assign
+                    </a>
+                    <a asp-controller="UserDashboards" asp-action="Details" asp-route-dashboardId="@Model.Id"
+                        class="text-decoration-none text-dark mx-1" title="View Dashboard">
+                        <i class="bi bi-eye me-1"></i> view
+                    </a>
+                </span>
+            </p>
+        </div>
+        @if (Model.AnnouncementCount > 0)
+        {
+            <span class="position-absolute top-0 end-0 translate-middle badge rounded-3 bg-container shadow-lg fs-5 text-dark p-2">
+                @Model.AnnouncementCount
+            </span>
+        }
+    </div>
+</div>

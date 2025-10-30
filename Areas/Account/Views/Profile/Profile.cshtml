@@ -1,0 +1,56 @@
+@model AccountViewModel
+@{
+    ViewData["Title"] = "Your account";
+    string profileImageUrl;
+    if (string.IsNullOrEmpty(Model.ProfileImageBase64))
+    {
+        profileImageUrl = Url.Content("~/images/default-avatar.png");
+    }
+    else
+    {
+        profileImageUrl = Model.ProfileImageBase64;
+    }
+}
+
+<div class="flex-grow-1 d-flex align-items-center my-3">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="bg-container col-11 col-sm-7 col-md-6 col-lg-5 col-xl-4 p-4 shadow rounded-4">
+
+                <!-- Title -->
+                <h1 class="text-center mb-1 fw-bold fs-3">YOUR PROFILE</h1>
+                <p class="text-center mb-3 text-dark fs-5">
+                    powered by announce<span class="fw-bold text-orange">IT</span>
+                </p>
+
+                <!-- Profile image -->
+                <div class="text-center mb-3">
+                    <img src="@profileImageUrl" class="profile-avatar img-fluid rounded-circle border border-2 border-warning shadow" alt="Profile picture" />
+                </div>
+
+                <!-- Full name -->
+                <div class="form-group mb-3 text-start">
+                    <label asp-for="Name" class="form-label fw-bold text-orange">full name</label>
+                    <input asp-for="Name" class="form-control border border-2 border-warning rounded-3 shadow-none" disabled />
+                </div>
+
+                <!-- Email -->
+                <div class="form-group mb-3 text-start">
+                    <label asp-for="Email" class="form-label fw-bold text-orange">e-mail</label>
+                    <input asp-for="Email" class="form-control border border-2 border-warning rounded-3 shadow-none" disabled />
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-grid gap-2">
+                    <a asp-action="Edit" class="btn btn-info w-100 py-2 mt-3 rounded-3">
+                        <i class="bi bi-pencil me-1"></i> edit account
+                    </a>
+
+                    <a asp-action="ChangePassword" class="btn btn-info w-100 py-2 rounded-3">
+                        <i class="bi bi-key me-1"></i> change password
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,129 @@
+@model Application.Areas.Announcements.Models.CreateGlobalAnnouncementViewModel
+
+<!-- Title -->
+<div class="form-group mb-3 text-start">
+    <label asp-for="Title" class="form-label fw-bold text-orange">title</label>
+    <input asp-for="Title" class="form-control rounded-3 shadow-none" placeholder="enter the title" required />
+    <span asp-validation-for="Title" class="text-danger fs-6"></span>
+</div>
+
+<!-- Category -->
+<div class="form-group mb-3 text-start">
+    <label asp-for="Category" class="form-label fw-bold text-orange">category</label>
+    <select asp-for="Category" asp-items="@(new SelectList(ViewBag.Categories, "Value", "Text"))"
+            class="form-control form-select rounded-3 shadow-none" required>
+        <option value="">-- select category --</option>
+    </select>
+    <span asp-validation-for="Category" class="text-danger fs-6"></span>
+</div>
+
+<!-- Description -->
+<div class="form-group mb-3 text-start">
+    <label asp-for="Description" class="form-label fw-bold text-orange">description</label>
+    <textarea asp-for="Description" class="form-control text-area rounded-3 shadow-none pt-2" placeholder="enter the description"></textarea>
+    <span asp-validation-for="Description" class="text-danger fs-6"></span>
+</div>
+
+<!-- Expiration Date -->
+<div class="form-group mb-3 text-start">
+    <label asp-for="ExpirationDate" class="form-label fw-bold text-orange">expires on</label>
+    <input asp-for="ExpirationDate" type="date" class="form-control rounded-3 shadow-none"
+           min="@DateTime.UtcNow.ToString("yyyy-MM-dd")"
+           max="@DateTime.UtcNow.AddYears(1).ToString("yyyy-MM-dd")" />
+    <span asp-validation-for="ExpirationDate" class="text-danger fs-6"></span>
+</div>
+
+<!-- Important -->
+<div class="form-group form-check mb-3 text-start">
+    <input asp-for="IsImportant" class="form-check-input" type="checkbox" id="IsImportantCheckbox" />
+    <label asp-for="IsImportant" class="form-check-label text-orange fw-bold" for="IsImportantCheckbox">important</label>
+    <span asp-validation-for="IsImportant" class="text-danger fs-6"></span>
+</div>
+
+<div class="form-group mb-3 text-start">
+    <label asp-for="SelectedDashboardIds" class="form-label fw-bold text-orange">select dashboards</label>
+
+    <div class="position-relative">
+        <button type="button"
+                id="dashboardDropdownBtn"
+                class="form-control rounded-3 shadow-none text-start d-flex justify-content-between align-items-center"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                style="padding-right: 2.5rem;">
+            <span id="dashboardDropdownText" class="text-secondary">-- select dashboards --</span>
+        </button>
+
+        <!-- Custom caret icon -->
+        <i class="bi bi-chevron-down position-absolute end-0 top-50 translate-middle-y me-3 text-black"></i>
+
+        <!-- Dropdown with checkboxes -->
+        <div class="dropdown-menu w-100 p-3 mt-1 border rounded-3 shadow-sm"
+             style="max-height: 200px; overflow-y: auto;"
+             aria-labelledby="dashboardDropdownBtn">
+
+            <!-- Select All -->
+            <div class="form-check mb-2">
+                <input type="checkbox" id="selectAllCheckbox" class="form-check-input" />
+                <label for="selectAllCheckbox" class="form-check-label">SELECT ALL</label>
+            </div>
+
+            <!-- Dynamic checkboxes -->
+            @foreach (var dash in Model.Dashboards)
+            {
+                <div class="form-check mb-1">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           name="SelectedDashboardIds"
+                           value="@dash.DashboardId"
+                           id="dash-@dash.DashboardId" />
+                    <label class="form-check-label" for="dash-@dash.DashboardId">@dash.Name</label>
+                </div>
+            }
+        </div>
+    </div>
+    <span asp-validation-for="SelectedDashboardIds" class="text-danger fs-6"></span>
+</div>
+
+<!-- Script: Select All + dynamic label update -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const selectAll = document.getElementById("selectAllCheckbox");
+        const checkboxes = document.querySelectorAll('input[name="SelectedDashboardIds"]');
+        const textSpan = document.getElementById("dashboardDropdownText");
+
+        function updateSelectedText() {
+            const selected = Array.from(checkboxes).filter(cb => cb.checked);
+
+            if (selected.length === 0) {
+                textSpan.textContent = "-- select dashboards --";
+                textSpan.classList.add("text-secondary");
+            } else if (selected.length === 1) {
+                textSpan.textContent = selected[0].nextElementSibling.textContent;
+                textSpan.classList.remove("text-secondary");
+            } else {
+                textSpan.textContent = `${selected.length} selected`;
+                textSpan.classList.remove("text-secondary");
+            }
+
+            // Update Select All checkbox state
+            selectAll.checked = selected.length === checkboxes.length;
+            selectAll.indeterminate = selected.length > 0 && selected.length < checkboxes.length;
+        }
+
+        // "Select All" checkbox toggles all others
+        if (selectAll) {
+            selectAll.addEventListener("change", function () {
+                checkboxes.forEach(cb => cb.checked = selectAll.checked);
+                updateSelectedText();
+            });
+        }
+
+        // Each checkbox updates the label and "Select All" state
+        checkboxes.forEach(cb => {
+            cb.addEventListener("change", updateSelectedText);
+        });
+
+        // Initial update on page load
+        updateSelectedText();
+    });
+</script>

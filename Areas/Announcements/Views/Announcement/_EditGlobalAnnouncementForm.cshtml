@@ -1,0 +1,78 @@
+@model Application.Areas.Announcements.Models.EditGlobalAnnouncementViewModel
+
+<!-- Title -->
+<div class="form-group mb-3 text-start">
+    <label asp-for="Title" class="form-label fw-bold text-orange">title</label>
+    <input asp-for="Title" class="form-control rounded-3 shadow-none" placeholder="enter the title" required />
+    <span asp-validation-for="Title" class="text-danger fs-6"></span>
+</div>
+
+<!-- Category -->
+<div class="form-group mb-3 text-start">
+    <label asp-for="Category" class="form-label fw-bold text-orange">category</label>
+    <select asp-for="Category" asp-items="@(new SelectList(ViewBag.Categories, "Value", "Text"))"
+            class="form-control form-select rounded-3 shadow-none" required>
+        <option value="">-- select category --</option>
+    </select>
+    <span asp-validation-for="Category" class="text-danger fs-6"></span>
+</div>
+
+<!-- Important -->
+<div class="form-group form-check mb-3 text-start">
+    <input asp-for="IsImportant" class="form-check-input" type="checkbox" id="IsImportantCheckbox" />
+    <label asp-for="IsImportant" class="form-check-label text-orange fw-bold" for="IsImportantCheckbox">important</label>
+    <span asp-validation-for="IsImportant" class="text-danger fs-6"></span>
+</div>
+
+<!-- Description -->
+<div class="form-group mb-3 text-start">
+    <label asp-for="Description" class="form-label fw-bold text-orange">description</label>
+    <textarea asp-for="Description" class="form-control text-area rounded-3 shadow-none pt-2" placeholder="enter the description"></textarea>
+    <span asp-validation-for="Description" class="text-danger fs-6"></span>
+</div>
+
+<!-- Expiration Date -->
+<div class="form-group mb-3 text-start">
+    <label asp-for="ExpirationDate" class="form-label fw-bold text-orange">expires on</label>
+    <input asp-for="ExpirationDate" type="date" class="form-control rounded-3 shadow-none"
+           min="@DateTime.UtcNow.ToString("yyyy-MM-dd")"
+           max="@DateTime.UtcNow.AddYears(1).ToString("yyyy-MM-dd")" />
+    <span asp-validation-for="ExpirationDate" class="text-danger fs-6"></span>
+</div>
+
+<!-- Dashboard Selection -->
+<h5 class="text-orange mt-4 mb-2">Select dashboards</h5>
+<div class="form-group">
+    <div class="form-check">
+        <input type="checkbox" id="selectAllCheckbox" class="form-check-input" />
+        <label for="selectAllCheckbox" class="form-check-label">Select All</label>
+    </div>
+
+    @foreach (var dash in Model.Dashboards)
+    {
+        var isChecked = Model.SelectedDashboardIds.Contains(dash.DashboardId);
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="SelectedDashboardIds" value="@dash.DashboardId" id="dash-@dash.DashboardId" @(isChecked ? "checked" : "") />
+            <label class="form-check-label" for="dash-@dash.DashboardId">@dash.Name</label>
+        </div>
+    }
+    <span asp-validation-for="SelectedDashboardIds" class="text-danger fs-6"></span>
+</div>
+
+<!-- Buttons: Cancel & Save -->
+<div class="d-flex gap-2">
+    <a href="@Model.PrevUrl" class="btn btn-dark w-50 py-2 rounded-3">
+        <i class="bi bi-x-lg me-1"></i> cancel
+    </a>
+
+    <button type="submit" class="btn btn-orange w-50 py-2 rounded-3">
+        <i class="bi bi-check-lg me-1"></i> save
+    </button>
+</div>
+
+<div class="text-center mt-2">
+    <button type="button" class="btn btn-danger w-100 py-1 rounded-3" hx-get hx-action="ConfirmDelete"
+            hx-route-announcementId="@Model.Id" hx-target="body" hx-swap="beforeend" title="Delete announcement">
+        <i class="bi bi-trash me-1"></i> delete
+    </button>
+</div>

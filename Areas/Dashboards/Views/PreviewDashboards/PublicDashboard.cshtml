@@ -1,0 +1,134 @@
+@model Application.Areas.Dashboards.Models.DashboardDetailsViewModel
+@{
+    ViewData["Title"] = "Dashboard Preview";
+    ViewBag.HideNavbarAndFooter = true;
+    string dashboardLink = ViewBag.DashboardLink!;
+
+    var categoryColors = new Dictionary<string, string>
+    {
+        { "Borrowing", "bg-red" },
+        { "RenovationNotice", "bg-blue" },
+        { "LostAndFound", "bg-orange" },
+        { "Technical", "bg-purple" },
+        { "BuySell", "bg-green" },
+        { "General", "bg-grey" },
+        { "Unsorted", "bg-yellow" },
+    };
+}
+
+<div class="d-flex flex-column w-100 vh-100">
+    <div class="mx-3 my-4 h-100">
+        @if (!Model.Announcements.Any())
+    {
+        <div class="alert alert-info text-center">No announcements available for this dashboard.</div>
+        <div class="d-flex justify-content-center">
+            <div class="text-center mb-3">
+                <p class="fw-semibold">Scan this QR code to open the dashboard (login required):</p>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?data=@Uri.EscapeDataString(dashboardLink)&size=350x350&bgcolor=255-245-238"
+                    alt="QR Code to authenticated dashboard" class="img-thumbnail" />
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="d-flex flex-row flex-grow-1 h-100">
+            <div class="col-lg-9 col-4k-10 mb-4 h-100">
+                <!-- Refresh the announcements every 5 min -->
+                <div id="announcements-scroll" style="max-height: 93vh; overflow-y: auto;" hx-get
+                    hx-action="GetAnnouncements" hx-route-dashboardId="@Model.Id"
+                    hx-route-dashboardToken="@Model.DashboardToken" hx-trigger="every 5m" hx-swap="innerHTML"
+                    hx-debug="true">
+                    @await Html.PartialAsync("_AnnouncementsList", Model.Announcements)
+                </div>
+            </div>
+
+
+             <div class="col-lg-3 col-4k-2 d-flex flex-column h-100 align-items-center mx-md-4">
+                <div class="text-center w-100 mb-auto">
+                    <h1 class="text-break">@Model.Name</h1>
+                    @if (!string.IsNullOrWhiteSpace(Model.Description))
+                    {
+                        <p class="text-muted lead text-break">@Model.Description</p>
+                    }
+                    <p class="text-black"><strong>Created by:</strong> @Model.AuthorName</p>
+                </div>
+
+                <div class="text-center w-100 mt-auto mb-3">
+                    <p class="fw-semibold">Scan this QR code to open the dashboard (login required):</p>
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?data=@Uri.EscapeDataString(dashboardLink)&size=350x350&bgcolor=255-245-238"
+                        alt="QR Code to authenticated dashboard"
+                        class="img-thumbnail" />
+                </div>
+            </div>
+        </div>
+    }
+    </div>
+</div>
+
+
+@section Styles {
+    <style>
+        body {
+            background-color: seashell;
+        }
+        #announcements-scroll {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        #announcements-scroll::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            const container = document.getElementById('announcements-scroll');
+            if (!container) return;
+            let scrollSpeed = 1;
+            let direction = 1;
+            let isPaused = false;
+            const pauseDuration = 2000;
+
+            function autoScroll() {
+                if (isPaused) return;
+
+                if (direction === 1) {
+                    if (Math.ceil(container.scrollTop + container.clientHeight) >= container.scrollHeight) {
+                        direction = -1;
+                        isPaused = true;
+                        setTimeout(() => {
+                            isPaused = false;
+                            requestAnimationFrame(autoScroll);
+                        }, pauseDuration);
+                        return;
+                    } else {
+                        container.scrollTop += scrollSpeed;
+                    }
+                } else {
+                    if (container.scrollTop <= 0) {
+                        direction = 1;
+                        isPaused = true;
+                        setTimeout(() => {
+                            isPaused = false;
+                            requestAnimationFrame(autoScroll);
+                        }, pauseDuration);
+                        return;
+                    } else {
+                        container.scrollTop -= scrollSpeed;
+                    }
+                }
+                requestAnimationFrame(autoScroll);
+            }
+
+            // Wait at the start before beginning to scroll
+            isPaused = true;
+            setTimeout(() => {
+                isPaused = false;
+                requestAnimationFrame(autoScroll);
+            }, pauseDuration);
+        })();
+</script>
+}

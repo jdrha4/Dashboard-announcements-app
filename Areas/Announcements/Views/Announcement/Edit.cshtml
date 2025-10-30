@@ -1,0 +1,29 @@
+@model EditAnnouncementViewModel
+
+@{
+    ViewData["Title"] = "Edit Announcement";
+}
+
+<div class="flex-grow-1 d-flex align-items-center justify-content-center my-3">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="bg-container col-11 col-sm-7 col-md-6 col-lg-5 col-xl-4 p-4 shadow rounded-4">
+
+                <h1 class="text-center mb-3 fw-bold fs-3">Edit Announcement</h1>
+
+                <form hx-post
+                      hx-action="SubmitEdit"
+                      hx-route-announcementId="@Model.Id"
+                      hx-target="body"
+                      hx-swap="none"
+                      method="post"
+                      class="w-100"
+                      novalidate>
+                    @Html.AntiForgeryToken()
+                    @await Html.PartialAsync("_EditForm", Model)
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>

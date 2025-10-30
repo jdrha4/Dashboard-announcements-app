@@ -1,0 +1,47 @@
+name: Unit-Tests
+
+on: workflow_call
+
+jobs:
+  unit-tests:
+    runs-on: ${{ matrix.platform }}
+
+    strategy:
+      fail-fast: false # Allows for matrix sub-jobs to fail without cancelling the rest
+      matrix:
+        platform: [ubuntu-latest, windows-latest]
+        dotnet-version: ["9.0.x"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build the project
+        run: dotnet build
+
+      - name: Run tests
+        run: dotnet test
+
+  tests-done:
+    needs: [unit-tests]
+    if: always() && !cancelled()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set status based on required jobs
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          for result in $RESULTS; do
+            if [ "$result" != "success" ]; then
+              exit 1
+            fi
+          done

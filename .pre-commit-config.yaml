@@ -1,0 +1,39 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+        exclude: Infrastructure/Database/Migrations
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+  - repo: local
+    hooks:
+      - id: check-charset
+        name: Prevent disallowed unicode characters
+        entry: python scripts/check_charset.py
+        language: python
+        types_or: ["c#"]
+        exclude: ^Infrastructure/Database/Migrations/
+
+  - repo: local
+    hooks:
+      - id: csharpier-format
+        name: csharpier-format
+        language: system
+        entry: dotnet-csharpier .
+        types_or: ["c#", "vb"]
+
+  - repo: local
+    hooks:
+      - id: dotnet-build
+        name: dotnet-build
+        language: system
+        entry: dotnet build
+        types_or: ["c#", "vb"]
+        pass_filenames: false

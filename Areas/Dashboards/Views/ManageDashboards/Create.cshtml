@@ -1,0 +1,37 @@
+@model CreateDashboardViewModel
+@{
+    ViewData["Title"] = "Create dashboard";
+}
+
+<div class="flex-grow-1 d-flex align-items-center my-3">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="bg-container col-11 col-sm-7 col-md-6 col-lg-5 col-xl-4 p-4 shadow rounded-4">
+
+                <!-- Title -->
+                <h1 class="text-center mb-1 fw-bold fs-3">CREATE A NEW DASHBOARD</h1>
+                <p class="text-center mb-3 text-dark fs-5">
+                    Set up your dashboard to track and manage your data with announce<span class="fw-bold text-orange">IT</span>
+                </p>
+
+                <form hx-post hx-action="CreateSubmit" hx-target="#dashboard-result" hx-swap="innerHTML" class="needs-validation">
+
+                    <div id="dashboard-result">
+                        @await Html.PartialAsync("_CreateForm", Model)
+                    </div>
+
+                    <!-- Buttons: Cancel & Create -->
+                    <div class="d-flex gap-2">
+                        <a asp-action="Index" class="btn btn-dark w-50 py-2 rounded-3">
+                            <i class="bi bi-x-lg me-1"></i> cancel
+                        </a>
+
+                        <button type="submit" class="btn btn-orange w-50 py-2 rounded-3">
+                            <i class="bi bi-check-lg me-1"></i> create
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

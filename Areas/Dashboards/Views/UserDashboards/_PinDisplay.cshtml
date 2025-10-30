@@ -1,0 +1,55 @@
+@model PinDisplayViewModel
+
+<div class="d-flex align-items-center gap-3 rounded-4 bg-container p-4 mb-4 text-break">
+
+    <!-- Key Icon-->
+   <i class="bi bi-key fs-1 text-orange"></i>
+
+    <div class="d-flex flex-column gap-3 flex-grow-1">
+
+        <!-- PIN -->
+        <div class="d-flex align-items-center flex-wrap gap-1">
+            <span class="fw-bold fs-5 mb-0">PIN:</span>
+            <span id="pinValue" class="badge bg-orange fs-5 px-2 py-1 rounded-3 mb-0 d-inline-flex align-items-center gap-2">
+                @Model.Pin
+                <button type="button" class="btn btn-sm p-0 border-0 bg-transparent"
+                        onclick="copyPin()" title="Copy PIN">
+                    <i class="bi bi-clipboard-fill fs-5 text-white"></i>
+                </button>
+            </span>
+        </div>
+
+        <!-- Expires At -->
+        <div>
+            <span class="fw-semibold small text-muted">expires at:</span><br />
+            <span class="fw-bold">
+                @(Model.ExpiresAt)
+            </span>
+        </div>
+
+        <!-- Preview Page -->
+        <div>
+            <span class="fw-semibold small text-muted">preview page:</span><br />
+            <a href="@Url.Action("Index", "PreviewDashboards", null, Context.Request.Scheme)"
+               target="_blank"
+               class="text-orange text-decoration-none fw-bold text-break">
+                @Url.Action("Index", "PreviewDashboards", null, Context.Request.Scheme)
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function copyPin() {
+        const pin = document.getElementById('pinValue')?.innerText;
+        if (!pin) return;
+
+        navigator.clipboard.writeText(pin)
+            .then(() => {
+                htmx.trigger(document.body, "sendToast", { msg: 'PIN copied.', bg: 'success' });
+            })
+            .catch(err => {
+                console.error('Error copying PIN:', err);
+            });
+    }
+</script>

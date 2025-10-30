@@ -1,0 +1,40 @@
+@model Guid
+
+<div class="modal fade show" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel"
+     aria-modal="true" role="dialog" style="display: block;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-danger text-white rounded-top-4 px-4 py-3">
+                <h5 class="modal-title fw-bold" id="confirmDeleteModalLabel">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> Confirm Deletion
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close" onclick="closeModal()"></button>
+            </div>
+            <div class="modal-body text-center text-secondary fs-5 px-4 pt-4">
+                Are you sure you want to permanently delete this announcement?
+            </div>
+            <div class="modal-footer justify-content-center border-0 pb-4 gap-2">
+                <form
+                      hx-post
+                      hx-action="Delete"
+                      hx-route-announcementId="@Model"
+                      hx-target="body"
+                      hx-swap="none">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="prevUrl" value="@ViewBag.PrevUrl" />
+                    <button type="submit" class="btn btn-danger px-4 py-2 rounded-pill fw-bold">
+                        <i class="bi bi-trash me-1"></i> YES, DELETE
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function closeModal() {
+        const modal = document.getElementById("confirmDeleteModal");
+        if (modal) modal.remove();
+    }
+</script>

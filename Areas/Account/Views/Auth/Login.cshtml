@@ -1,0 +1,43 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Sign in";
+}
+
+<div class="flex-grow-1 d-flex align-items-center my-3">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="bg-container col-11 col-sm-7 col-md-6 col-lg-5 col-xl-4 p-4 shadow rounded-4">
+
+                <!-- Title -->
+                <h1 class="text-center mb-1 fw-bold fs-3">LET’S SIGN IN</h1>
+                <p class="text-center mb-3 text-dark fs-5">
+                    & start with announce<span class="fw-bold text-orange">IT</span>
+                </p>
+
+                <form hx-post hx-action="LoginSubmit" hx-target="#login-result" hx-swap="innerHTML" class="needs-validation" novalidate>
+
+                    <input type="hidden" asp-for="ReturnUrl" />
+
+                    <div id="login-result">
+                        @await Html.PartialAsync("_LoginForm", Model)
+                    </div>
+
+                    <!-- Sign in button -->
+                    <button type="submit" class="btn btn-orange w-100 py-2 mt-3 rounded-3">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>sign in
+                    </button>
+
+                    <!-- Forgot password -->
+                    <div class="text-center mt-3 fs-5">
+                        <a asp-action="ForgotPassword" class="text-decoration-none fw-bold text-orange">forgot password?</a>
+                    </div>
+
+                    <!-- Sign up link -->
+                    <div class="text-center mt-2 fs-5 text-dark">
+                        don’t have an account? <a asp-action="Register" class="text-decoration-none fw-bold text-orange">sign up</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

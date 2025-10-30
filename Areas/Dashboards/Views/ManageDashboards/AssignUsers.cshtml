@@ -1,0 +1,56 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Assign Users";
+
+    var users = ViewBag.Users as List<Application.Infrastructure.Database.Models.UserDo>
+    ?? new List<Application.Infrastructure.Database.Models.UserDo>();
+}
+
+<div class="flex-grow-1 d-flex align-items-center my-3">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="bg-container col-11 col-sm-7 col-md-6 col-lg-5 col-xl-4 p-4 shadow rounded-4">
+
+                <!-- Title -->
+                <h1 class="text-center mb-1 fw-bold fs-3">ASSIGN USER TO DASHBOARD</h1>
+                <p class="text-center mb-3 text-dark fs-5">
+                    dashboard: <span class="fw-bold text-orange">@Model.Name</span>
+                </p>
+
+                <!-- Search Input -->
+                <div class="mb-4">
+                    <input type="text" id="query"
+                           class="form-control form-control-lg rounded-3 shadow-none"
+                           autocomplete="off"
+                           placeholder="Search users"
+                           hx-get
+                           hx-action="SearchUsers"
+                           hx-route-dashboardId="@Model.Id"
+                           hx-target="#search-results"
+                           hx-trigger="keyup changed delay:250ms, users-updated from:body"
+                           hx-indicator="#search-loader"
+                           hx-vals='js:{query: document.getElementById("query").value}' />
+                </div>
+
+                <!-- Search Results -->
+                <div class="mb-4">
+                    <div id="search-loader" class="htmx-indicator text-center text-muted">Loading...</div>
+                    <div id="search-results"></div>
+                </div>
+
+                <!-- Assigned Users -->
+                <h3 class="text-center mb-1 fw-bold fs-4">ASSIGNED USERS</h3>
+
+                <div id="assigned-users" hx-get hx-action="AssignedUsers" hx-route-dashboardId="@Model.Id" hx-trigger="load, users-updated from:body" hx-swap="innerHTML">
+                </div>
+
+                <!-- Back Button -->
+                <div class="d-grid">
+                    <a asp-action="Index" class="btn btn-orange w-100 py-2 mt-3 rounded-3">
+                        <i class="bi bi-arrow-return-left me-1"></i> back to dashboards
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

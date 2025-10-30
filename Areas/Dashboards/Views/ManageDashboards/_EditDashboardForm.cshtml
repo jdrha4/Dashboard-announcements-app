@@ -1,0 +1,18 @@
+@model EditDashboardViewModel
+
+<!-- Dashboard title -->
+<div class="form-group mb-3 text-start">
+    <label asp-for="Name" class="form-label fw-bold text-orange">dashboard name</label>
+    <input asp-for="Name" class="form-control rounded-3 shadow-none">
+    <span asp-validation-for="Name" class="text-danger fs-6"></span>
+</div>
+
+<!-- Description -->
+<div class="form-group mb-3 text-start">
+    <label asp-for="Description" class="form-label fw-bold text-orange">description</label>
+    <textarea asp-for="Description" class="form-control text-area rounded-3 shadow-none pt-2"></textarea>
+    <span asp-validation-for="Description" class="text-danger fs-6"></span>
+</div>
+
+<!-- Hidden ID -->
+<input type="hidden" asp-for="Id" />

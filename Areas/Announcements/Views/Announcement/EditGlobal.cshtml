@@ -1,0 +1,46 @@
+@model Application.Areas.Announcements.Models.EditGlobalAnnouncementViewModel
+
+@{
+    ViewData["Title"] = "Edit global announcement";
+}
+
+<div class="flex-grow-1 d-flex align-items-center my-3">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="bg-container col-11 col-sm-7 col-md-6 col-lg-5 col-xl-4 p-4 shadow rounded-4">
+
+                <h1 class="text-center mb-1 fw-bold fs-3">EDIT GLOBAL ANNOUNCEMENT</h1>
+
+                <form id="announcementForm" hx-post hx-action="SubmitEditGlobalAnnouncement" hx-route-announcementId="@Model.Id" hx-target="#announcement-result" novalidate>
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" asp-for="PrevUrl" />
+
+                    <div id="announcement-result">
+                        @await Html.PartialAsync("_EditGlobalAnnouncementForm", Model)
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('selectAllCheckbox').addEventListener('change', function () {
+            const checkboxes = document.querySelectorAll('input[name="SelectedDashboardIds"]');
+            checkboxes.forEach(function (checkbox) {
+                checkbox.checked = document.getElementById('selectAllCheckbox').checked;
+            });
+        });
+
+        document.getElementById('announcementForm').onsubmit = function (event) {
+            var selected = document.querySelectorAll('input[name="SelectedDashboardIds"]:checked');
+            if (selected.length === 0) {
+                event.preventDefault();
+                alert('You must select at least one dashboard.');
+            }
+        };
+    </script>
+}

@@ -1,0 +1,47 @@
+@model EditAccountViewModel
+
+<!-- Profile image -->
+<div class="text-center mb-1">
+    <img id="profileAvatarPreview" src="@(Model.ProfileImageBase64 ?? Url.Content("~/images/default-avatar.png"))"
+         class="profile-avatar img-fluid rounded-circle border border-2 border-warning shadow" alt="Profile picture" />
+</div>
+
+<!-- Upload & Remove buttons -->
+<div class="d-flex justify-content-center gap-2 mb-3">
+    <!-- Remove button -->
+    <button type="button" onclick="removeProfileImage()" class="btn btn-danger py-1 d-flex gap-1 rounded-3">
+        <i class="bi bi-trash3 fs-6"></i> <span class="fs-6 fw-semibold">Remove</span>
+    </button>
+
+    <!-- Upload button -->
+    <button type="button" onclick="document.getElementById('ProfileImageInput').click()" class="btn btn-success py-1 d-flex gap-1 rounded-3">
+        <i class="bi bi-upload fs-6"></i> <span class="fs-6 fw-semibold">Upload</span>
+    </button>
+
+    <input type="file" id="ProfileImageInput" name="ProfileImage" accept=".jpg,.jpeg,.png,.gif" hidden onchange="updateProfilePicture()" />
+    <input type="checkbox" name="RemoveProfileImage" id="RemoveProfileImage" value="true" hidden />
+</div>
+
+<!-- Full name -->
+<div class="form-group mb-3 text-start">
+    <label asp-for="Name" class="form-label fw-bold text-orange">full name</label>
+    <input asp-for="Name" class="form-control rounded-3 shadow-none" required autocomplete="name"/>
+    <span asp-validation-for="Name" class="text-danger fs-6"></span>
+</div>
+
+<!-- Email -->
+<div class="form-group mb-3 text-start">
+    <label asp-for="Email" class="form-label fw-bold text-orange">email</label>
+    <input asp-for="Email" class="form-control rounded-3 shadow-none" required autocomplete="email"/>
+    <span asp-validation-for="Email" class="text-danger fs-6"></span>
+</div>
+
+<!-- Confirm password -->
+<div class="form-group mb-3 text-start">
+    <label asp-for="CurrentPassword" class="form-label fw-bold text-orange">confirm changes</label>
+    <div class="password-wrapper position-relative">
+        <input asp-for="CurrentPassword" class="form-control rounded-3 shadow-none pe-5" type="password" placeholder="enter your password" required autocomplete="current-password"/>
+        <i class="bi bi-eye toggle-password position-absolute top-50 end-0 translate-middle-y me-3"></i>
+    </div>
+    <span asp-validation-for="CurrentPassword" class="text-danger fs-6"></span>
+</div>

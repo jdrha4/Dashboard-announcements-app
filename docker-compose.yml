@@ -1,0 +1,48 @@
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "password123%"
+    volumes:
+      - db_data:/var/opt/mssql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P password123% -Q 'SELECT 1' || exit 1",
+        ]
+      interval: 10s
+      retries: 10
+      start_period: 10s
+      timeout: 3s
+
+  # This is slightly awkward, but well, mssql doesn't support init scripts directly
+  # so short of making a custom dockerfile for it, this is the best we can do.
+  # We need this init script to create a new database for us and a less privileged user.
+  mssql-configurator:
+    image: mcr.microsoft.com/mssql/server:latest
+    volumes:
+      - ./docker-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    depends_on:
+      mssql:
+        condition: service_healthy
+    command: >
+      bash -c '
+      /opt/mssql-tools18/bin/sqlcmd -C -S mssql -U sa -P password123% -d master -i docker-entrypoint-initdb.d/init.sql;
+      echo "All done!";
+      '
+
+  aspnet:
+    build:
+      context: .
+    depends_on:
+      mssql-configurator:
+        condition: service_completed_successfully
+    ports:
+      - "8080:8080"
+    environment:
+      ConnectionStrings__Database: "Data Source=mssql,1433;Initial Catalog=STAG-AUIUI-P8VT;Integrated Security=false;User ID=myuser;Password=123password%;TrustServerCertificate=true"
+
+volumes:
+  db_data:

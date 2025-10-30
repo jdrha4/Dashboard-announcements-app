@@ -1,0 +1,42 @@
+@model AssignUsersViewModel
+@{
+    var notAssignedUsers = Model.Users.Where(u => !u.IsAssigned).ToList();
+    var assignedUsers = Model.Users.Where(u => u.IsAssigned).ToList();
+}
+
+<div>
+    @if (Model.Users.Any())
+    {
+        <div class="list-group">
+            @foreach (var user in notAssignedUsers)
+            {
+                <button type="button"
+                    hx-post hx-action="AssignUser" hx-route-dashboardId="@Model.DashboardId"
+                    hx-vals='{"userId": "@user.UserId"}' hx-swap="none"
+                    class="list-group-item bg-white text-dark border border-secondary-subtle border-thick rounded p-3 mb-2 w-100 small text-start" >
+
+                    @await Html.PartialAsync("_UserItem", user, new ViewDataDictionary(ViewData)
+                    {
+                        { "icon", "bi-person-plus-fill" },
+                        { "textClass", "text-muted" }
+                    })
+                </button>
+            }
+
+            @foreach (var user in assignedUsers)
+            {
+                <div class="list-group-item bg-success bg-opacity-10 text-success border border-success border-thick rounded p-3 mb-2 w-100 small text-start">
+                    @await Html.PartialAsync("_UserItem", user, new ViewDataDictionary(ViewData)
+                    {
+                        { "icon", "bi-person-check-fill" },
+                        { "textClass", "text-success" }
+                    })
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-center">No users found matching your query.</p>
+    }
+</div>

@@ -1,0 +1,94 @@
+@using Application.Infrastructure.Database.Models
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model Application.Areas.Account.Models.UserRoleViewModel
+
+@{
+    var roles = ViewData["Roles"] as List<SelectListItem>;
+    string currentRoleValue = ((int)Model.CurrentRole).ToString();
+
+    string roleIconClass = currentRoleValue switch
+    {
+        "1" => "bi-person-badge",
+        "2" => "bi-shield-lock-fill",
+        "0" => "bi-people-fill",
+        _ => "bi-question-circle-fill"
+    };
+}
+
+<div class="container flex-grow-1 d-flex align-items-center mb-3 p-3 gap-3 d-flex flex-column flex-lg-row bg-container rounded-3">
+    <div class="me-md-3 mb-3 mb-md-0">
+        @if (!string.IsNullOrEmpty(Model.ProfileImageBase64))
+        {
+            <img src="@Model.ProfileImageBase64" class="rounded-circle shadow-sm profile-thumbnail" />
+        }
+        else
+        {
+            <img src="~/images/default-avatar.png" class="rounded-circle shadow-sm profile-thumbnail" />
+        }
+    </div>
+
+    <div class="flex-grow-1 d-flex align-items-center">
+        <i class="bi @roleIconClass me-2 fs-2"></i>
+        <div>
+            <strong class="text-break">@Model.UserName</strong><br />
+            <span class="text-break">@Model.UserEmail</span>
+        </div>
+    </div>
+
+    <div class="ms-md-3 mt-3 mt-md-0">
+        @if (Model.IsSelf)
+        {
+            <span class="badge bg-container text-black">You cannot change your own role</span>
+        }
+        else
+        {
+            <div class="d-flex align-items-center gap-2 flex-wrap flex-md-nowrap user-role-actions w-100">
+                <!-- Change role form -->
+                <form hx-post hx-action="ChangeRole"
+                    hx-target="closest div.container"
+                    hx-swap="outerHTML"
+                    hx-trigger="submit"
+                    hx-on="htmx:afterRequest:sendToast"
+                    class="d-flex align-items-center flex-grow-1 flex-shrink-1 flex-wrap flex-md-nowrap">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" name="userId" value="@Model.UserId" />
+
+                    <label class="form-label me-2 text-nowrap mb-0">Select Role:</label>
+                    <select name="newRole" class="form-select me-2 bg-white flex-shrink-1" style="min-width:120px;">
+                        @if (roles != null)
+                        {
+                            foreach (var role in roles)
+                            {
+                                <option value="@role.Value" selected="@(role.Value == currentRoleValue)">
+                                    @role.Text
+                                </option>
+                            }
+                        }
+                    </select>
+
+                    <button type="submit" class="btn btn-orange fs-5 rounded-3 flex-shrink-0 w-btn">
+                        <i class="bi bi-check-lg"></i> Save
+                    </button>
+                </form>
+
+                <form
+                    hx-post
+                    hx-action="DeleteUser"
+                    hx-route-userId="@Model.UserId"
+                    hx-target="closest div.container"
+                    hx-swap="outerHTML"
+                    hx-confirm="Are you sure you want to delete user '@Model.UserName'?"
+                    class="d-inline">
+
+                    @Html.AntiForgeryToken()
+
+                    <button type="submit" class="btn btn-danger fs-5 rounded-3 flex-shrink-0 w-btn">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </form>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,23 @@
+@model List<string>
+
+@if (Model.Any())
+{
+    <div class="d-flex flex-column gap-2">
+        @foreach (var domain in Model)
+        {
+            <div class="d-flex justify-content-between align-items-center p-3 rounded-3 border border-warning bg-white">
+                <span class="fs-5 text-md-truncate text-break w-100 me-2">
+                    @domain
+                </span>
+
+                <button class="btn btn-danger btn-sm rounded-3" hx-delete hx-action="DeleteDomain" hx-route-domain="@domain" hx-target="#domain-list" hx-swap="innerHTML">
+                    <i class="bi bi-trash-fill"></i>
+                </button>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p class="text-center text-muted fs-5">No domains have been added yet.</p>
+}

@@ -1,0 +1,63 @@
+@model IEnumerable<DashboardViewModel>
+@{
+    bool isAuth = User.Identity?.IsAuthenticated == true;
+    bool isAdmin = User.IsInRole("Admin");
+    bool isManager = User.IsInRole("Manager");
+    bool isManageDashboards = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "ManageDashboards", StringComparison.OrdinalIgnoreCase);
+    ViewData["Title"] = isManageDashboards ? "Manage Dashboards" : "My Dashboards";
+}
+
+<div class="container d-flex flex-column pt-5 pb-3">
+    <div class="dashboard-list-header d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <h2 class="mb-0">@ViewData["Title"]</h2>
+        <input type="text" id="dashboardSearch" class="form-control w-50 rounded-4 dashboard-search-input" placeholder="Search dashboards by name..."
+               onkeyup="filterDashboards()">
+    </div>
+
+    @if (!Model.Any())
+    {
+        <p>No dashboards have been created yet.</p>
+    }
+    else
+    {
+        <div id="dashboardsContainer" class="row row-cols-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-2 gy-4">
+            @foreach (var dashboard in Model)
+            {
+                @await Html.PartialAsync("_DashboardCard", dashboard)
+            }
+        </div>
+    }
+
+    @if (isAuth && (isAdmin || isManager) && isManageDashboards)
+    {
+        <div class="mt-auto pt-3 d-flex justify-content-end gap-4">
+            <a asp-area="Announcements"
+                asp-controller="Announcement"
+                asp-action="CreateGlobal"
+                class="text-decoration-none text-warning fw-bold">
+                    <i class="bi bi-megaphone-fill me-2"></i> create global announcement
+            </a>
+
+            <a asp-area="Dashboards"
+               asp-controller="ManageDashboards"
+               asp-action="Create"
+               class="text-decoration-none text-warning fw-bold">
+                <i class="bi bi-plus-square-fill me-2"></i> create dashboard
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function filterDashboards() {
+            let input = document.getElementById("dashboardSearch").value.toLowerCase();
+            let cards = document.querySelectorAll(".dashboard-card");
+
+            cards.forEach(card => {
+                let name = (card.getAttribute("data-name") || "").toLowerCase();
+                card.style.display = name.includes(input) ? "block" : "none";
+            });
+        }
+    </script>
+}

@@ -1,0 +1,27 @@
+@model Application.Areas.Announcements.Models.AnnouncementWithConversationViewModel
+
+<div class="conversation-thread d-flex flex-column gap-3">
+
+    @if (Model.ConversationMessages.Any())
+    {
+        // Loop through and display each comment
+        foreach (var message in Model.ConversationMessages)
+        {
+            <div class="announcement-comment p-3 rounded-3 bg-white shadow-sm">
+                <!-- Comment author -->
+                <h6 class="fw-bold text-dark">@message.Author</h6>
+
+                <!-- Comment content -->
+                <p class="mb-1">@message.Content</p>
+
+                <!-- Timestamp formatted to local time -->
+                <small class="text-muted">Posted at @message.PostedAt.ToLocalTime().ToString("g")</small>
+            </div>
+        }
+    }
+    else
+    {
+        // Message shown when there are no comments
+        <p class="text-muted text-center">No comments yet.</p>
+    }
+</div>

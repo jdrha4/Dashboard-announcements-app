@@ -1,0 +1,41 @@
+@model CreateAnnouncementViewModel
+
+@{
+    ViewData["Title"] = "Create announcement";
+    Guid? dashboardId = ViewBag.DashboardId;
+    string prevUrl = ViewBag.PrevUrl;
+}
+
+<div class="flex-grow-1 d-flex align-items-center my-3">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="bg-container col-11 col-sm-7 col-md-6 col-lg-5 col-xl-4 p-4 shadow rounded-4">
+
+                <!-- Title -->
+                <h1 class="text-center mb-1 fw-bold fs-3">CREATE NEW ANNOUNCEMENT</h1>
+
+                <form hx-post hx-action="CreateAnnouncement" hx-target="#announcement-result" hx-swap="innerHTML" novalidate>
+
+                    <input type="hidden" name="dashboardId" value="@dashboardId" />
+                    <input type="hidden" name="prevUrl" value="@prevUrl" />
+
+                    <div id="announcement-result">
+                        @await Html.PartialAsync("_CreateAnnouncementForm", Model)
+                    </div>
+
+                    <!-- Buttons: Cancel & Create -->
+                    <div class="d-flex gap-2">
+                        <a href="javascript:history.go(-1)" class="btn btn-dark w-50 py-2 rounded-3">
+                            <i class="bi bi-x-lg me-1"></i> cancel
+                        </a>
+
+                        <button type="submit" class="btn btn-orange w-50 py-2 rounded-3">
+                            <i class="bi bi-check-lg me-1"></i> create
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>

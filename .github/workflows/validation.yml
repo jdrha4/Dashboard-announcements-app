@@ -1,0 +1,44 @@
+name: Validation
+
+on: workflow_call
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "9.0.x"
+
+      # Needed for pre-commit installation
+      - name: Setup python (uv)
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install pre-commit
+        run: uv tool install pre-commit
+
+      - name: Restore dependencies
+        run: |
+          dotnet restore
+          dotnet tool restore
+
+      # Building also runs the code analyzers
+      - name: Build the project
+        run: dotnet build -warnaserror
+
+      - name: Check formatting (dotnet)
+        run: dotnet format --verify-no-changes --severity warn
+
+      - name: Code formatting (csharpier)
+        run: dotnet csharpier --check .
+
+      # Pre-commit also introduces some non-locally ran checks (e.g. trailing whitespace fixer)
+      # run these remaining checks. (The rest of the checks are ran individually, as it's easier
+      # to see what failed quickly that way.)
+      - name: Run remaining pre-commit checks
+        run: SKIP=dotnet-build,csharpier-format uv tool run pre-commit run --all-files

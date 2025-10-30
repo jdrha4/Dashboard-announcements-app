@@ -1,0 +1,8 @@
+@model List<Application.Areas.Account.Models.UserRoleViewModel>
+
+<div class="list-group">
+    @foreach (var user in Model)
+    {
+        @await Html.PartialAsync("_UserRoleFormRow", user)
+    }
+</div>

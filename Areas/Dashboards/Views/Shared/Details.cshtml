@@ -1,0 +1,224 @@
+@model DashboardDetailsViewModel
+
+@{
+    ViewData["Title"] = $"Dashboard: {Model.Name}";
+    var prevUrl = ViewBag.PrevUrl as string ?? Url.Action("Index", "UserDashboards");
+    var isOwnerOrAdmin = User.IsInRole("Admin") || Model.CurrentUserId == Model.AuthorId;
+}
+
+<div class="container d-flex flex-column pt-3 pb-3">
+    <div class="text-start mb-4">
+        <h2 class="fw-bold text-uppercase">@Model.Name</h2>
+        <p class="text-orange">@Model.Description</p>
+        <p class="text-dark small">created by: <strong>@Model.AuthorName</strong></p>
+
+        <div class="row g-3 mb-3">
+            <div class="col-12 mb-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-end bg-light-subtle p-3 rounded-4 shadow-sm gap-3">
+
+                    <!-- LEFT SIDE: Filter + Form + SAVE -->
+                    <div class="d-flex flex-row flex-wrap align-items-end gap-2">
+
+                        <!-- Category Filter -->
+                        <div class="d-flex flex-column justify-content-end me-4">
+                            <label for="announcementFilter" class="form-label fw-semibold text-dark small mb-1">Filter by category</label>
+                            <select id="announcementFilter"
+                                    class="form-select form-select-sm rounded-3 shadow-none"
+                                    style="height: 31.6px;"
+                                    onchange="filterAnnouncements()">
+                                <option value="">all categories</option>
+                                @foreach (var category in Enum.GetValues(typeof(Application.Infrastructure.Database.Models.AnnouncementCategory)))
+                                {
+                                    <option value="@category">@category</option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Form -->
+                        @if (isOwnerOrAdmin)
+                        {
+                            <form
+                                hx-post hx-action="UpdateSettings" hx-controller="ManageDashboards" hx-route-dashboardId="@Model.Id"
+                                hx-trigger="submit" hx-swap="none" method="post" class="d-flex flex-row flex-wrap align-items-end gap-2 mb-0">
+
+                                @Html.AntiForgeryToken()
+
+                                <!-- Expiration -->
+                                <div class="d-flex flex-column justify-content-end">
+                                    <label for="expiryOption" class="form-label fw-semibold text-dark small mb-1">Expiration date</label>
+                                    <select asp-for="ExpiryOption"
+                                            asp-items="Html.GetEnumSelectList<ExpiryOption>()"
+                                            class="form-select form-select-sm rounded-3 shadow-none"
+                                            style="height: 31.6px;">
+                                        <option value="">-- select --</option>
+                                    </select>
+                                </div>
+
+                                <!-- Max announcements -->
+                                <div class="d-flex flex-column justify-content-end">
+                                    <label for="maxAnnouncements" class="form-label fw-semibold text-dark small mb-1">Max. announcements</label>
+                                    <input id="maxAnnouncements"
+                                           name="maxAnnouncements"
+                                           type="number"
+                                           min="10" max="200"
+                                           class="form-control form-control-sm rounded-3 shadow-none"
+                                           value="@(Model.MaxAnnouncements > 0 ? Model.MaxAnnouncements : 50)"
+                                           style="height: 31.6px;"/>
+                                </div>
+
+                                <!-- SAVE BUTTON -->
+                                <div class="d-flex flex-column justify-content-end">
+                                    <label class="form-label invisible mb-1">Save</label>
+                                    <button type="submit"
+                                            class="btn btn-warning btn-sm d-flex align-items-center gap-1 px-3 rounded-3 shadow-none"
+                                            style="height: 31.6px;">
+                                        <i class="bi bi-save"></i> SAVE
+                                    </button>
+                                </div>
+                            </form>
+                        }
+                    </div>
+
+                    <!-- RIGHT SIDE: Action Links -->
+                    @if (isOwnerOrAdmin)
+                    {
+                        <div class="d-flex flex-wrap align-items-end gap-3" style="height: 31.6px;">
+                            <a asp-controller="ManageDashboards" asp-action="Edit" asp-route-dashboardId="@Model.Id" class="text-decoration-none text-warning fw-bold">
+                                <i class="bi bi-pencil-square me-1"></i> edit dashboard
+                            </a>
+                            <a type="button" class="text-decoration-none text-warning fw-bold" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+                                <i class="bi bi-trash me-1"></i> delete dashboard
+                            </a>
+                            <button type="button" class="bg-transparent border-0 p-0 m-0 text-warning fw-bold text-decoration-none"
+                                    hx-post hx-action="GeneratePreviewPin" hx-controller="UserDashboards"
+                                    hx-route-dashboardId="@Model.Id" hx-target="#pin-modal-body" hx-swap="innerHTML"
+                                    onclick="showPinModal()">
+                                <i class="bi bi-key me-1"></i> preview pin
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    @if (isOwnerOrAdmin)
+    {
+        <div id="pin-display"></div>
+    }
+
+    @if (!Model.Announcements.Any())
+    {
+        <div class="alert alert-info text-center">No announcements found in this dashboard.</div>
+    }
+    else
+    {
+        <div id="announcementsContainer" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 p-3 bg-white">
+            @foreach (AnnouncementViewModel announcement in Model.Announcements
+                    .OrderByDescending(a => a.IsImportant))
+            {
+                <div class="col announcement-card" data-category="@announcement.Category">
+                    @await Html.PartialAsync("_AnnouncementNote", announcement)
+                </div>
+            }
+        </div>
+    }
+
+    <div class="mt-auto pt-3 d-flex justify-content-between align-items-center gap-4">
+        <a href="@prevUrl" class="text-decoration-none text-warning fw-bold">
+            <i class="bi bi-box-arrow-left me-1"></i> back to dashboards
+        </a>
+        <a asp-area="Announcements" asp-controller="Announcement" asp-action="Create" asp-route-dashboardId="@Model.Id"
+           class="text-decoration-none text-warning fw-bold">
+            <i class="bi bi-plus-square-fill me-1"></i> add announcement
+        </a>
+    </div>
+
+    <!-- Modal window section -->
+    <div class="modal fade" id="announcementModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" id="announcementDialog">
+            <div class="modal-content rounded-4" id="modal-container">
+                <!-- HTMX loads content here -->
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="pinModal" tabindex="-1" aria-labelledby="pinModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4">
+
+                <!-- Header -->
+                <div class="modal-header bg-orange text-white rounded-top-4">
+                    <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="pinModalLabel">
+                        <i class="bi bi-key"></i> Dashboard Preview PIN
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body p-4" id="pin-modal-body">
+                    <!-- HTMX loads PIN here dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header bg-danger text-white rounded-top-4 px-4 py-3">
+                    <h5 class="modal-title fw-bold" id="confirmDeleteModalLabel">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> Confirm Deletion
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center text-secondary fs-5 px-4 pt-4">
+                    Are you sure you want to permanently delete this dashboard?
+                </div>
+                <div class="modal-footer justify-content-center border-0 pb-4 gap-2">
+                    <form hx-post hx-action="Delete" hx-controller="ManageDashboards" hx-route-dashboardId="@Model.Id"
+                        hx-target="body" hx-swap="outerHTML">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger px-4 py-2 rounded-3 fw-bold">
+                            <i class="bi bi-trash me-1"></i> YES, DELETE
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showPinModal() {
+            var modal = new bootstrap.Modal(document.getElementById('pinModal'));
+            modal.show();
+        }
+
+        function filterAnnouncements() {
+            let filter = document.getElementById("announcementFilter").value.toLowerCase();
+            let cards = document.querySelectorAll(".announcement-card");
+
+            cards.forEach(card => {
+                let category = (card.getAttribute("data-category") || "").toLowerCase();
+                card.style.display = filter === "" || category === filter ? "block" : "none";
+            });
+        }
+
+        document.body.addEventListener("htmx:afterSwap", (event) => {
+            if (event.target.id === "modal-container") {
+                var modal = new bootstrap.Modal(document.getElementById('announcementModal'));
+                modal.show();
+
+                const dialog = document.getElementById("announcementDialog");
+                if (dialog) {
+                    const hasPoll = dialog.querySelector('[data-has-poll="true"]') !== null;
+                    dialog.classList.remove("modal-lg", "modal-xxl");
+                    dialog.classList.add(hasPoll ? "modal-xxl" : "modal-lg");
+                }
+            }
+        });
+    </script>
+}

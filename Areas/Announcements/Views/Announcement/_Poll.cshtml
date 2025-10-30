@@ -1,0 +1,112 @@
+@model AnnouncementWithConversationViewModel
+
+@{
+    bool hasVoted = Model.PollChoices.Any(c => c.HasUserVoted);
+    int totalVotes = Model.PollChoices.Sum(c => c.VoteCount);
+    var inputType = Model.IsMultichoice ? "checkbox" : "radio";
+}
+
+<form id="pollForm"
+      hx-post
+      hx-action="Vote"
+      hx-controller="Announcement"
+      hx-route-announcementId="@Model.Id"
+      hx-target="#poll-container"
+      hx-swap="outerHTML"
+      class="d-flex flex-column h-100">
+
+    @Html.AntiForgeryToken()
+
+    <!-- Submit button -->
+    <div class="mb-3 px-3 py-2 rounded-3 shadow-sm bg-light-subtle">
+        @if (!hasVoted)
+        {
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary d-flex gap-1 px-4 py-1 rounded-3">
+                    <i class="bi bi-check-circle fs-6"></i>
+                    <span class="fs-6 fw-semibold">Submit Vote</span>
+                </button>
+            </div>
+        }
+        else
+        {
+            <div class="text-center">
+                <span class="text-success fw-semibold">
+                    <i class="bi bi-check-circle-fill me-1"></i>
+                    You have already voted!
+                </span>
+            </div>
+        }
+    </div>
+
+    <!-- Poll choices -->
+    <div class="flex-grow-1 overflow-auto border rounded-4 p-3 bg-light-subtle mb-2" style="min-height: 0;">
+        @foreach (var pollChoice in Model.PollChoices)
+        {
+            var inputId = $"pollChoice_{pollChoice.Id}";
+            var votePercentage = totalVotes > 0
+                ? (int)((pollChoice.VoteCount / (double)totalVotes) * 100)
+                : 0;
+
+            <div class="border rounded-3 p-3 bg-white position-relative w-100 mb-2">
+                <div class="form-check d-flex align-items-center">
+                    <input class="form-check-input me-2"
+                           type="@inputType"
+                           id="@inputId"
+                           name="pollChoices"
+                           value="@pollChoice.Id"
+                           @(hasVoted ? "disabled" : "") />
+
+                    <label class="form-check-label fw-semibold" for="@inputId">
+                        @pollChoice.ChoiceText
+                    </label>
+                </div>
+
+                @if (hasVoted)
+                {
+                    <div class="progress mt-2" style="height: 8px;">
+                        <div class="progress-bar bg-orange" role="progressbar"
+                             style="width: @votePercentage%;" aria-valuenow="@votePercentage"
+                             aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                    </div>
+                    <small class="text-muted">@pollChoice.VoteCount votes — @votePercentage%</small>
+                }
+            </div>
+        }
+    </div>
+</form>
+
+<script>
+    // Listen for server-side triggers (HX-Trigger)
+    document.body.addEventListener("htmx:afterSettle", function (event) {
+        const detail = event.detail;
+        const triggerName = detail?.trigger;
+        const toastData = detail?.value;
+
+        if (triggerName === "sendToast" && toastData) {
+            showToast(toastData.msg ?? "Notice", toastData.bg ?? "info");
+        }
+    });
+
+    // Toast rendering logic
+    function showToast(message, type = "info") {
+        const toast = document.createElement("div");
+        toast.className = `toast align-items-center text-bg-${type} border-0 show position-fixed bottom-0 start-50 translate-middle-x mb-4 shadow`;
+        toast.role = "alert";
+        toast.style.zIndex = 1060;
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                        data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.remove("show");
+            toast.addEventListener("transitionend", () => toast.remove());
+        }, 3000);
+    }
+</script>

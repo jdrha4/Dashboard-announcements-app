@@ -1,0 +1,89 @@
+@model EditAccountViewModel
+@{
+    ViewData["Title"] = "Edit account";
+}
+
+<div class="flex-grow-1 d-flex align-items-center my-3">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="bg-container col-11 col-sm-7 col-md-6 col-lg-5 col-xl-4 p-4 shadow rounded-4">
+
+                <!-- Title -->
+                <h1 class="text-center mb-1 fw-bold fs-3">EDIT YOUR PROFILE</h1>
+                <p class="text-center mb-3 text-dark fs-5">
+                    & keep your profile up to date with announce<span class="fw-bold text-orange">IT</span>
+                </p>
+
+
+                <form hx-post hx-action="EditSubmit" hx-encoding="multipart/form-data" hx-target="#edit-result" hx-swap="innerHTML" class="needs-validation" novalidate>
+                    <div id="edit-result">
+                        @await Html.PartialAsync("_EditForm", Model)
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="d-flex gap-2">
+                        <a asp-action="Index" class="btn btn-dark w-50 py-2 rounded-3">
+                            <i class="bi bi-x-lg me-1"></i> cancel
+                        </a>
+
+                        <button type="submit" class="btn btn-orange w-50 py-2 rounded-3">
+                            <i class="bi bi-check-lg me-1"></i> save
+                        </button>
+                    </div>
+                </form>
+                <div class="text-center mt-2">
+                    <form
+                        hx-post
+                        hx-action="DeleteOwnAccount"
+                        hx-confirm="Are you sure you want to delete your account? This action cannot be undone."
+                        hx-target="body"
+                        hx-swap="none">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit" class="btn btn-danger w-100 py-1 rounded-3">
+                            <i class="bi bi-trash me-1"></i> Delete My Account
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const defaultAvatarUrl = '@Url.Content("~/images/default-avatar.png")';
+
+        function removeProfileImage() {
+            const preview = document.getElementById("profileAvatarPreview");
+            const fileInput = document.getElementById("ProfileImageInput");
+            const removeCheckbox = document.getElementById("RemoveProfileImage");
+
+            if (!preview || !fileInput || !removeCheckbox) return;
+
+            removeCheckbox.checked = true;
+            fileInput.value = "";
+            preview.src = defaultAvatarUrl;
+        }
+
+        function updateProfilePicture() {
+            const fileInput = document.getElementById("ProfileImageInput");
+            const preview = document.getElementById("profileAvatarPreview");
+            const removeCheckbox = document.getElementById("RemoveProfileImage");
+
+            if (!fileInput || !preview || !removeCheckbox) return;
+
+            removeCheckbox.checked = false;
+
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+}

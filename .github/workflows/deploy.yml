@@ -1,0 +1,22 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Deploy the project
+        run: dotnet publish -p:PublishProfile=PublishProfile -p:Password=${{ secrets.DEPLOY_PASSWORD }}

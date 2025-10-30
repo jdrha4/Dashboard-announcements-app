@@ -1,0 +1,180 @@
+@model CreateAnnouncementViewModel
+
+<!-- Announcement input -->
+<div class="form-group mb-3 text-start">
+    <label asp-for="Title" class="form-label fw-bold text-orange">title</label>
+    <input asp-for="Title" class="form-control rounded-3 shadow-none" placeholder="enter the title" required>
+    <span asp-validation-for="Title" class="text-danger fs-6"></span>
+</div>
+
+<!-- Category dropdown -->
+<div class="form-group mb-3 text-start">
+    <label asp-for="Category" class="form-label fw-bold text-orange">category</label>
+    <select asp-for="Category" class="form-control form-select rounded-3 shadow-none" asp-items="ViewBag.Categories"
+        required>
+        <option value="">-- select category --</option>
+    </select>
+    <span asp-validation-for="Category" class="text-danger fs-6"></span>
+</div>
+
+<!-- Description input -->
+<div class="form-group mb-3 text-start">
+    <label asp-for="Description" class="form-label fw-bold text-orange">description</label>
+    <textarea asp-for="Description" class="form-control text-area rounded-3 shadow-none pt-2"
+        placeholder="enter the description"></textarea>
+    <span asp-validation-for="Description" class="text-danger fs-6"></span>
+</div>
+
+<div class="form-group mb-3 text-start">
+    <label asp-for="ExpirationDate" class="form-label fw-bold text-orange">expires on</label>
+    <input asp-for="ExpirationDate" type="date" class="form-control rounded-3 shadow-none"
+       min="@(DateTime.UtcNow.ToString("yyyy-MM-dd"))" max="@(Model.MaxAllowedExpirationDate.ToString("yyyy-MM-dd"))" />
+    <span asp-validation-for="ExpirationDate" class="text-danger fs-6"></span>
+</div>
+
+<!-- Centered checkboxes for IsImportant and HasPoll -->
+@if (User.IsInRole("Admin") || Model.CurrentUserId == Model.DashboardAuthorId)
+{
+    <div class="form-group mb-3 text-center">
+        <div class="d-inline-flex gap-4 align-items-center flex-wrap justify-content-center">
+
+            <!-- IsImportant checkbox -->
+            <div class="form-check m-0">
+                <input asp-for="IsImportant" class="form-check-input" type="checkbox" id="IsImportantCheckbox" />
+                <label asp-for="IsImportant" class="form-check-label text-orange fw-bold" for="IsImportantCheckbox">
+                    important
+                </label>
+                <span asp-validation-for="IsImportant" class="text-danger fs-6"></span>
+            </div>
+
+            <!-- HasPoll checkbox -->
+            <div class="form-check m-0">
+                <input type="checkbox" asp-for="HasPoll" class="form-check-input" id="HasPollCheckbox" />
+                <label class="form-check-label text-orange fw-bold" for="HasPollCheckbox">
+                    include poll
+                </label>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Poll section -->
+    <div id="pollSection" class="border rounded-4 p-3 mb-3 bg-light-subtle"
+        style="display: @(Model.HasPoll ? "block" : "none");">
+        <h5 class="text-orange fw-bold mb-3">Poll options</h5>
+
+        <div class="form-check mb-3">
+            <input type="checkbox" asp-for="IsMultichoice" class="form-check-input" id="IsMultichoiceCheckbox" />
+            <label class="form-check-label" for="IsMultichoiceCheckbox">allow multiple choices</label>
+        </div>
+
+        <div id="pollChoices" class="mb-3">
+            <div class="input-group mb-2">
+                <input name="PollChoices" class="form-control rounded-3 shadow-none" placeholder="Choice 1" />
+            </div>
+            <div class="input-group mb-2">
+                <input name="PollChoices" class="form-control rounded-3 shadow-none" placeholder="Choice 2" />
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-center gap-3 mt-3">
+            <!-- Add Choice button -->
+            <button type="button" onclick="addPollChoice()" class="btn btn-success py-1 d-flex gap-1 rounded-3">
+                <i class="bi bi-plus-circle fs-6"></i>
+                <span class="fs-6 fw-semibold">Add Choice</span>
+            </button>
+
+            <!-- Delete Last button -->
+            <button type="button" onclick="deleteLastPollChoice()" class="btn btn-danger py-1 d-flex gap-1 rounded-3">
+                <i class="bi bi-dash-circle fs-6"></i>
+                <span class="fs-6 fw-semibold">Delete Last</span>
+            </button>
+        </div>
+    </div>
+}
+
+<!-- Script section -->
+<script>
+    function initPollSection() {
+        const pollCheckbox = document.getElementById('HasPollCheckbox');
+        const pollSection = document.getElementById('pollSection');
+
+        function togglePollSection() {
+            if (pollSection) {
+                pollSection.style.display = pollCheckbox.checked ? 'block' : 'none';
+            }
+        }
+
+        if (pollCheckbox && pollSection) {
+            // First sync the visual state with the checkbox
+            togglePollSection();
+
+            // Then set up the event listener for future changes
+            pollCheckbox.removeEventListener('change', togglePollSection);
+            pollCheckbox.addEventListener('change', togglePollSection);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', initPollSection);
+
+    document.body.addEventListener('htmx:afterSwap', initPollSection);
+
+    function addPollChoice() {
+        const pollChoicesDiv = document.getElementById('pollChoices');
+        const choiceCount = pollChoicesDiv.querySelectorAll('input').length + 1;
+
+        const newChoice = document.createElement('div');
+        newChoice.classList.add('input-group', 'mb-2');
+
+        const input = document.createElement('input');
+        input.name = "PollChoices";
+        input.className = "form-control rounded-3 shadow-none";
+        input.placeholder = `Choice ${choiceCount}`;
+
+        newChoice.appendChild(input);
+        pollChoicesDiv.appendChild(newChoice);
+    }
+
+    function deleteLastPollChoice() {
+        const pollChoicesDiv = document.getElementById('pollChoices');
+        const inputs = pollChoicesDiv.querySelectorAll('.input-group');
+
+        if (inputs.length > 2) {
+            pollChoicesDiv.removeChild(inputs[inputs.length - 1]);
+        } else {
+            showToast("You must have at least two poll options.", "danger");
+        }
+    }
+
+    // Show toast message
+    function showToast(message, type = "info") {
+        const toast = document.createElement("div");
+        toast.className = `toast align-items-center text-bg-${type} border-0 show position-fixed bottom-0 start-50 translate-middle-x mb-4 shadow`;
+        toast.role = "alert";
+        toast.style.zIndex = 1060;
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                        data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.remove("show");
+            toast.addEventListener("transitionend", () => toast.remove());
+        }, 3000);
+    }
+
+    // Listen for HTMX-triggered toast from controller
+    document.body.addEventListener("htmx:afterSettle", function (event) {
+        const detail = event.detail;
+        const triggerName = detail?.trigger;
+        const toastData = detail?.value;
+
+        if (triggerName === "sendToast" && toastData) {
+            showToast(toastData.msg ?? "Notice", toastData.bg ?? "info");
+        }
+    });
+</script>

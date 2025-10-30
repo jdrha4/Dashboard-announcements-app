@@ -1,0 +1,292 @@
+/* Colors */
+:root {
+    --orange: #fea63b;
+    --red: #fdbda2;
+    --blue: #cad6ff;
+    --yellow: #fde6bc;
+    --green: #d4ebb5;
+    --purple: #cdabff;
+    --grey: #a7a7a7;
+    --beige: #f4e3c4;
+    --darkred: #d00000;
+
+    --container-color: var(--beige);
+}
+.text-orange {
+    color: var(--orange);
+}
+.bg-container {
+    background-color: var(--container-color) !important;
+}
+.bg-important {
+    color: var(--darkred);
+}
+
+.bg-red {
+    background-color: var(--red);
+}
+.bg-blue {
+    background-color: var(--blue);
+}
+.bg-yellow {
+    background-color: var(--yellow);
+}
+.bg-green {
+    background-color: var(--green);
+}
+.bg-orange {
+    background-color: var(--orange);
+}
+.bg-purple {
+    background-color: var(--purple);
+}
+.bg-grey {
+    background-color: var(--grey);
+}
+
+/* Font */
+body {
+    font-family: "Red Hat Display", sans-serif;
+}
+
+.logo-img {
+    height: 70px;
+}
+.navbar-border {
+    border-bottom: 1px solid;
+}
+.nav-link {
+    color: #6c757d;
+}
+.nav-link:hover {
+    color: #444444;
+}
+.active {
+    color: #ffa500 !important;
+}
+
+/* Input box */
+.form-control {
+    background-color: transparent;
+    border: 1px solid #000000;
+    height: 48px;
+    padding: 0 1rem;
+}
+
+.form-control:focus {
+    border-color: var(--orange);
+}
+
+/* Button */
+.btn-orange {
+    background-color: var(--orange);
+    color: white;
+    font-weight: 600;
+}
+
+.btn-orange:hover {
+    background-color: #ff9900;
+}
+
+.profile-avatar {
+    width: 130px;
+    height: 130px;
+    object-fit: cover;
+}
+
+.profile-thumbnail {
+    width: 4rem;
+    height: 4rem;
+    object-fit: cover;
+}
+
+.text-area {
+    resize: none;
+    height: 120px;
+}
+
+/* Cards */
+
+.card {
+    border-color: #eaeaea;
+    background-color: #f9c972;
+    border-radius: 1rem;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 2vh 1vw;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 5 / 2;
+    box-sizing: border-box;
+}
+
+@media (max-width: 500px) {
+    .dashboard-grid {
+        gap: 1vh 2vw;
+    }
+}
+
+.dashboard-item {
+    width: 100%;
+    height: 100%;
+    background: var(--container-color);
+    border-radius: 8px;
+    filter: contrast(1.1);
+    box-sizing: border-box;
+}
+
+#announcementsContainer {
+    max-height: 500px;
+    overflow-y: auto;
+    border-radius: 1rem;
+    border: 1px solid #eee;
+    background: #fff;
+}
+
+.dashboard-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.dashboard-search-input {
+    min-width: 220px;
+    max-width: 400px;
+}
+
+.category-filter-dropdown {
+    min-width: 180px;
+    max-width: 100%;
+}
+
+.dashboard-action-buttons {
+    gap: 0.5rem;
+}
+
+@media (max-width: 1000px) {
+    .dashboard-action-buttons {
+        flex-direction: column !important;
+        align-items: flex-end !important;
+    }
+    .dashboard-action-buttons a {
+        width: 100%;
+        text-align: right;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1200px) {
+    .list-group-item {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        text-align: left !important;
+    }
+    .user-role-actions {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        flex-wrap: nowrap !important;
+        width: 100%;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    .user-role-actions form,
+    .user-role-actions select,
+    .user-role-actions button,
+    .user-role-actions .form-label {
+        width: auto !important;
+        min-width: 0;
+        max-width: 100%;
+        margin-bottom: 0 !important;
+    }
+    .user-role-actions .form-label {
+        margin-right: 0.5rem;
+        white-space: nowrap;
+    }
+    .user-role-actions select {
+        min-width: 140px;
+    }
+}
+
+@media (max-width: 768px) {
+    .list-group-item {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        text-align: left !important;
+    }
+    .user-role-actions {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.75rem !important;
+        width: 100%;
+    }
+    .user-role-actions form,
+    .user-role-actions select,
+    .user-role-actions button {
+        width: 100% !important;
+        max-width: 100%;
+    }
+    .user-role-actions .form-label {
+        margin-bottom: 0.25rem;
+    }
+}
+
+@media (max-width: 500px) {
+    .dashboard-list-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem 0;
+    }
+    .dashboard-search-input {
+        width: 100% !important;
+        max-width: 100%;
+    }
+}
+
+@media (min-width: 3840px) {
+    .row-cols-4k-8 > * {
+        flex: 0 0 auto;
+        width: 12.5%;
+    }
+    .col-4k-10 {
+        flex: 0 0 auto;
+        width: 86.5%;
+    }
+    .col-4k-2 {
+        flex: 0 0 auto;
+        width: 12.5%;
+    }
+}
+
+
+.modal-scrollable-body {
+    max-height: 75vh;
+    overflow-y: auto;
+}
+
+.min-height-0 {
+    min-height: 0 !important;
+}
+
+@media (max-width: 768px) {
+    #announcementDialog {
+        max-width: 95vw !important;
+        height: auto !important;
+    }
+
+    #announcementDialog .modal-content {
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #announcementDialog .modal-body {
+        flex-grow: 1;
+        overflow-y: auto;
+    }
+}

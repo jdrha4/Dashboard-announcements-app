@@ -1,0 +1,2 @@
+# (CRLF is a waste of a byte, but Windows insists on it by default — because, of course, it does)
+* text=auto eol=lf

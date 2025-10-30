@@ -1,0 +1,60 @@
+@model Application.Areas.Announcements.Models.CreateGlobalAnnouncementViewModel
+
+@{
+    ViewData["Title"] = "Create global announcement";
+}
+
+<div class="flex-grow-1 d-flex align-items-center my-3">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="bg-container col-11 col-sm-7 col-md-6 col-lg-5 col-xl-4 p-4 shadow rounded-4">
+
+                <h1 class="text-center mb-1 fw-bold fs-3">CREATE GLOBAL ANNOUNCEMENT</h1>
+
+                <form hx-post hx-action="SubmitGlobalAnnouncement" hx-target="#announcement-result" class="mt-4" id="announcementForm">
+
+                    @Html.AntiForgeryToken()
+
+
+                    <div id="announcement-result">
+                        @await Html.PartialAsync("_CreateGlobalAnnouncementForm", Model)
+                    </div>
+
+                    <!-- Buttons: Cancel & Create -->
+                    <div class="d-flex gap-2 mt-4">
+                        <a asp-action="Index" asp-controller="ManageDashboards" asp-area="Dashboards" class="btn btn-dark w-50 py-2 rounded-3">
+                            <i class="bi bi-x-lg me-1"></i> cancel
+                        </a>
+
+                        <button type="submit" class="btn btn-orange w-50 py-2 rounded-3">
+                            <i class="bi bi-check-lg me-1"></i> create
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Toggle all dashboard checkboxes based on the "Select All" checkbox
+        document.getElementById('selectAllCheckbox').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('input[name="SelectedDashboardIds"]');
+            checkboxes.forEach(function(checkbox) {
+                checkbox.checked = document.getElementById('selectAllCheckbox').checked;
+            });
+        });
+
+        // Custom validation to ensure at least one checkbox is selected
+        document.getElementById('announcementForm').onsubmit = function(event) {
+            var selected = document.querySelectorAll('input[name="SelectedDashboardIds"]:checked');
+
+            if (selected.length === 0) {
+                event.preventDefault();  // Prevent form submission
+                alert('You must select at least one dashboard.');
+            }
+        };
+    </script>
+}

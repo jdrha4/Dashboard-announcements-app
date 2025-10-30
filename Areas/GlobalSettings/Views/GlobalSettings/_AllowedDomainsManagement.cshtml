@@ -1,0 +1,21 @@
+@model GlobalSettingsViewModel
+
+<form asp-action="AddDomain" hx-post hx-action="AddDomain" hx-indicator="#domain-add-spinner" hx-target="#allowed-domains-section" class="mb-3">
+
+    <div class="input-group gap-1">
+        <!-- Add domain input -->
+        <input asp-for="NewDomain" class="form-control rounded-3 shadow-none" placeholder="example.com"/>
+
+        <!-- Add domain button -->
+        <button type="submit" class="btn btn-orange py-2 rounded-3">
+            add
+        </button>
+    </div>
+
+    <span asp-validation-for="NewDomain" class="text-danger fs-6"></span>
+</form>
+
+<!-- Domain List Loader -->
+<div id="domain-list" hx-get hx-action="GetAllowedDomainsList" hx-trigger="load, domain-list-updated from:body" hx-swap="innerHTML">
+    <p class="text-center text-muted"><em>Loading domains...</em></p>
+</div>
