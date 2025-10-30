@@ -7,7 +7,7 @@ This is a .NET project, built with [ASP.NET] framework.
 First, clone the project with git (you will need to have git authenticated to your GitHub account):
 
 ```bash
-git clone https://github.com/jdrha4/Dashboard-announcements-app-C#
+git clone https://github.com/jdrha4/Dashboard-announcements-app
 ```
 
 To set up the project, you will need [dotnet] installed. Once done, run:
